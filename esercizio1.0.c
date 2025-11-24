@@ -20,7 +20,7 @@ int main() {
     int count = 0;
     int max;
     int min;
-    int primo_valido = 1;  // Flag per il primo numero valido
+    int primo_valido = 1; 
 
     printf("Inserisci i numeri di cui vuoi calcolare la media (possono essere positivi o negativi): \n");
 
