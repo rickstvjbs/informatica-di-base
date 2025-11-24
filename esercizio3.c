@@ -50,7 +50,7 @@ int main() {
     struct Studente studenti[MAX_STUDENTI];
     int n = 0;
     int scelta;
-    
+
     do {
         printf("\nMenu:\n");
         printf("1) Inserisci un nuovo studente\n");
@@ -60,20 +60,27 @@ int main() {
         printf("5) Trova e stampa lo studente con il voto massimo\n");
         printf("0) Esci\n");
         printf("Scelta: ");
-        scanf("%d", &scelta);
-        
+
+        if (scanf("%d", &scelta) != 1) {
+            printf("Input non valido.\n");
+            while (getchar() != '\n');
+            scelta = -1;
+            continue;
+        }
+
         switch (scelta) {
             case 1:
                 if (n < MAX_STUDENTI) {
                     n = inserisci_studente(studenti, n);
-                    break;
                 } else {
                     printf("Array pieno, non puoi inserire altri studenti.\n");
                 }
                 break;
+
             case 2:
                 stampa_studenti(studenti, n);
                 break;
+
             case 3:
                 if (n > 0) {
                     printf("Media voti: %.2f\n", media_voti(studenti, n));
@@ -81,67 +88,98 @@ int main() {
                     printf("Nessuno studente registrato.\n");
                 }
                 break;
+
             case 4: {
                 int matricola;
                 printf("Inserisci matricola da cercare: ");
-                scanf("%d", &matricola);
+                if (scanf("%d", &matricola) != 1) {
+                    printf("Input non valido.\n");
+                    while (getchar() != '\n');
+                    break;
+                }
+
                 int indice = cerca_per_matricola(studenti, n, matricola);
-                if (indice != -1) {
+                if (indice < n) {
                     printf("Studente trovato: Matricola %d, Voto %d, CFU %d\n",
-                           studenti[indice].matricola, studenti[indice].voto, studenti[indice].cfu);
+                           studenti[indice].matricola,
+                           studenti[indice].voto,
+                           studenti[indice].cfu);
                 } else {
                     printf("Studente non trovato.\n");
                 }
                 break;
             }
+
             case 5:
                 if (n > 0) {
                     int indice = indice_voto_massimo(studenti, n);
                     printf("Studente con voto massimo: Matricola %d, Voto %d, CFU %d\n",
-                           studenti[indice].matricola, studenti[indice].voto, studenti[indice].cfu);
+                           studenti[indice].matricola,
+                           studenti[indice].voto,
+                           studenti[indice].cfu);
                 } else {
                     printf("Nessuno studente registrato.\n");
                 }
                 break;
+
             case 0:
                 printf("Uscita dal programma.\n");
                 break;
+
             default:
                 printf("Scelta non valida.\n");
         }
+
     } while (scelta != 0);
-    
+
     return 0;
 }
 
+
 int inserisci_studente(struct Studente v[], int n) {
+
     printf("Inserisci matricola: ");
-    scanf("%d", &v[n].matricola);
-    while(v[n].voto < 18 || v[n].voto > 30){
+    while (scanf("%d", &v[n].matricola) != 1) {
+        printf("Matricola non valida. Inserisci un numero: ");
+        while (getchar() != '\n');
+    }
+
+    do {
         printf("Inserisci voto (18-30): ");
-        scanf("%d", &v[n].voto);
+        if (scanf("%d", &v[n].voto) != 1) {
+            printf("Input non valido. Inserisci un numero.\n");
+            while (getchar() != '\n');
+            continue;
         }
-         if (v[n].voto < 18 || v[n].voto > 30)
-            printf("Voto non valido. inserisci un voto tra 18 e 30");
-        printf("%d", v[n].voto);
+        if (v[n].voto < 18 || v[n].voto > 30)
+            printf("Voto non valido. Deve essere tra 18 e 30.\n");
+
+    } while (v[n].voto < 18 || v[n].voto > 30);
+
     printf("Inserisci CFU: ");
-    scanf("%d", &v[n].cfu);
+    while (scanf("%d", &v[n].cfu) != 1) {
+        printf("CFU non validi. Inserisci un numero: ");
+        while (getchar() != '\n');
+    }
+
     return n + 1;
 }
+
 
 void stampa_studenti(struct Studente v[], int n) {
     if (n == 0) {
         printf("Nessuno studente registrato.\n");
         return;
     }
+
     for (int i = 0; i < n; i++) {
         printf("Studente %d: Matricola %d, Voto %d, CFU %d\n",
-               i+1, v[i].matricola, v[i].voto, v[i].cfu);
+               i + 1, v[i].matricola, v[i].voto, v[i].cfu);
     }
 }
 
+
 float media_voti(struct Studente v[], int n) {
-    if (n == 0) return 0.0;
     int somma = 0;
     for (int i = 0; i < n; i++) {
         somma += v[i].voto;
@@ -149,17 +187,18 @@ float media_voti(struct Studente v[], int n) {
     return (float)somma / n;
 }
 
+
 int cerca_per_matricola(struct Studente v[], int n, int matricola) {
     for (int i = 0; i < n; i++) {
         if (v[i].matricola == matricola) {
             return i;
         }
     }
-    return -1;  // Aggiunto return -1 mancante
+    return n;   // indica "non trovato" SENZA usare -1
 }
 
+
 int indice_voto_massimo(struct Studente v[], int n) {
-    if (n == 0) return -1;
     int max_indice = 0;
     for (int i = 1; i < n; i++) {
         if (v[i].voto > v[max_indice].voto) {
