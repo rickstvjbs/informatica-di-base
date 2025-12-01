@@ -1,1 +1,0 @@
-#Consegne informatica di base
